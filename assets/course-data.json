@@ -1,0 +1,75 @@
+[
+  {
+    "id": "stage_01_basics",
+    "name": "阶段一 基础入门",
+    "lessons": [
+      {
+        "id": "lesson_01_intro",
+        "name": "课程介绍与环境搭建",
+        "source": "基础教程",
+        "video": [
+          "/video/example/basics/01_课程介绍.mp4",
+          "/video/example/basics/02_环境搭建.mp4"
+        ],
+        "notes": "## 课程介绍\n\n本节课介绍课程整体结构和学习路线。\n\n## 环境搭建\n\n安装所需工具和配置开发环境。"
+      },
+      {
+        "id": "lesson_02_fundamentals",
+        "name": "基础概念与语法",
+        "source": "基础教程",
+        "video": [
+          "/video/example/basics/03_基础概念.mp4",
+          "/video/example/basics/04_语法详解.mp4",
+          "/video/example/basics/05_练习讲解.mp4"
+        ],
+        "notes": "## 基础概念\n\n核心概念的讲解。\n\n## 语法详解\n\n详细讲解语法规则和常见用法。"
+      }
+    ]
+  },
+  {
+    "id": "stage_02_advanced",
+    "name": "阶段二 进阶提升",
+    "lessons": [
+      {
+        "id": "lesson_03_advanced_01",
+        "name": "高级特性（上）",
+        "source": "进阶教程",
+        "video": [
+          "/video/example/advanced/01_高级特性上.mp4"
+        ]
+      },
+      {
+        "id": "lesson_04_advanced_02",
+        "name": "高级特性（下）",
+        "source": "进阶教程",
+        "video": [
+          "/video/example/advanced/02_高级特性下.mp4"
+        ]
+      },
+      {
+        "id": "lesson_05_project",
+        "name": "实战项目",
+        "source": "进阶教程",
+        "video": [
+          "/video/example/advanced/03_项目实战.mp4",
+          "/video/example/advanced/04_代码讲解.mp4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "stage_03_extras",
+    "name": "阶段三 拓展学习",
+    "lessons": [
+      {
+        "id": "lesson_06_extras",
+        "name": "延伸阅读与总结",
+        "source": "拓展内容",
+        "video": [
+          "/video/example/extras/01_总结与展望.mp4"
+        ],
+        "notes": "## 总结\n\n回顾核心知识点，展望后续学习方向。"
+      }
+    ]
+  }
+]

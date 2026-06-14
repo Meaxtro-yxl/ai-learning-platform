@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.db
+summaries_cache.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.bak
+
+# User-specific config (optional)
+# Uncomment if you want to ignore local VIDEO_ROOTS config
+# server_config.json

@@ -1,0 +1,3767 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 学习平台</title>
+<style>
+/* ============================================================
+   Editorial Minimalism — AI Learning Navigator
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Base */
+  --bg: #0a0a0e;
+  --surface: rgba(18, 18, 24, 0.55);
+  --surface-hover: rgba(30, 30, 40, 0.65);
+  --surface-active: rgba(40, 40, 52, 0.75);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --text: #e0dfe5;
+  --text-secondary: #9898a4;
+  --text-muted: #6a6a78;
+  --text-dim: #444452;
+  --accent: #e8e7ed;
+  --accent-hover: #ffffff;
+  --done: #5a9a5a;
+  --done-bg: rgba(50, 120, 50, 0.15);
+  --star: #c4a040;
+  --star-bg: rgba(180, 140, 50, 0.12);
+  --warn: #d47050;
+  --skeleton: rgba(255, 255, 255, 0.04);
+  --skeleton-shine: rgba(255, 255, 255, 0.08);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
+  --scrollbar-track: transparent;
+  --sidebar-w: 280px;
+  --font-ui: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --font-display: Georgia, 'Times New Roman', 'Noto Serif SC', serif;
+
+  /* Glass */
+  --glass-bg: rgba(18, 18, 28, 0.58);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-blur: 18px;
+  --glass-saturate: 1.3;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+
+  /* Fluid gradient colors — dark */
+  --blob-a: rgba(70, 40, 120, 0.28);
+  --blob-b: rgba(30, 80, 110, 0.24);
+  --blob-c: rgba(100, 50, 80, 0.22);
+  --blob-d: rgba(40, 100, 70, 0.18);
+}
+
+[data-theme="light"] {
+  --bg: #f2f0ed;
+  --surface: rgba(255, 255, 255, 0.55);
+  --surface-hover: rgba(245, 244, 240, 0.65);
+  --surface-active: rgba(235, 233, 228, 0.75);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.05);
+  --text: #1a1a1e;
+  --text-secondary: #6a6a6e;
+  --text-muted: #9a9a9e;
+  --text-dim: #ccc9c4;
+  --accent: #1a1a1e;
+  --accent-hover: #000000;
+  --done: #3a8a3a;
+  --done-bg: rgba(50, 130, 50, 0.1);
+  --star: #9a8030;
+  --star-bg: rgba(150, 120, 40, 0.1);
+  --warn: #b05040;
+  --skeleton: rgba(0, 0, 0, 0.04);
+  --skeleton-shine: rgba(0, 0, 0, 0.08);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+
+  --glass-bg: rgba(255, 255, 255, 0.52);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+  --blob-a: rgba(190, 160, 220, 0.2);
+  --blob-b: rgba(140, 190, 210, 0.18);
+  --blob-c: rgba(220, 160, 180, 0.17);
+  --blob-d: rgba(150, 200, 170, 0.15);
+}
+
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* ── Fluid Gradient Background ── */
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.7;
+  will-change: transform;
+}
+
+.bg-blob.a {
+  width: 60vw;
+  height: 60vw;
+  background: var(--blob-a);
+  animation: blob-float-a 18s ease-in-out infinite;
+  top: -15%;
+  left: -10%;
+}
+
+.bg-blob.b {
+  width: 55vw;
+  height: 55vw;
+  background: var(--blob-b);
+  animation: blob-float-b 22s ease-in-out infinite;
+  top: 40%;
+  right: -15%;
+}
+
+.bg-blob.c {
+  width: 45vw;
+  height: 45vw;
+  background: var(--blob-c);
+  animation: blob-float-c 20s ease-in-out infinite;
+  bottom: -10%;
+  left: 25%;
+}
+
+.bg-blob.d {
+  width: 35vw;
+  height: 35vw;
+  background: var(--blob-d);
+  animation: blob-float-d 16s ease-in-out infinite;
+  top: 5%;
+  right: 30%;
+}
+
+@keyframes blob-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(12vw, 8vh) scale(1.15); }
+  50% { transform: translate(6vw, 18vh) scale(0.9); }
+  75% { transform: translate(-4vw, 6vh) scale(1.1); }
+}
+
+@keyframes blob-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-10vw, -12vh) scale(1.2); }
+  66% { transform: translate(-6vw, 10vh) scale(0.85); }
+}
+
+@keyframes blob-float-c {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8vw, -14vh) scale(1.25); }
+}
+
+@keyframes blob-float-d {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(5vw, -10vh) scale(1.3) rotate(15deg); }
+}
+
+/* Subtle noise texture overlay */
+.bg-noise {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+/* ============================================================
+   Layout
+   ============================================================ */
+#app { display: flex; height: 100vh; position: relative; z-index: 1; }
+
+#sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--glass-border);
+  position: relative;
+  z-index: 2;
+  transition: width 0.2s ease, min-width 0.2s ease;
+  box-shadow: var(--glass-shadow);
+}
+
+#sidebar.collapsed {
+  width: 42px;
+  min-width: 42px;
+}
+#sidebar.collapsed .sidebar-title,
+#sidebar.collapsed .search-wrap,
+#sidebar.collapsed #tree-container,
+#sidebar.collapsed .goal-display,
+#sidebar.collapsed .sidebar-btn:not(.sidebar-collapse-btn):not(#btn-theme) {
+  display: none;
+}
+#sidebar.collapsed .sidebar-header {
+  padding: 10px 6px;
+}
+#sidebar.collapsed .sidebar-title-row {
+  justify-content: center;
+  margin-bottom: 0;
+}
+#sidebar.collapsed .sidebar-collapse-btn {
+  transform: rotate(180deg);
+}
+#sidebar.collapsed .sidebar-footer {
+  padding: 8px 6px;
+}
+#sidebar.collapsed .sidebar-actions {
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+#main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: transparent;
+}
+
+/* ============================================================
+   Sidebar — Header
+   ============================================================ */
+.sidebar-header {
+  padding: 16px 16px 10px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.sidebar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sidebar-collapse-btn {
+  font-size: 10px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+.sidebar-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+
+.search-wrap {
+  position: relative;
+}
+
+.search-wrap input {
+  width: 100%;
+  height: 32px;
+  padding: 0 12px 0 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-wrap input:focus {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.search-wrap input::placeholder { color: var(--text-muted); }
+
+[data-theme="light"] .search-wrap input {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .search-wrap input:focus {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Sidebar — Tree
+   ============================================================ */
+#tree-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.tree-stage {
+  margin-bottom: 2px;
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  padding: 7px 16px 7px 10px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.12s;
+}
+
+.stage-header:hover { color: var(--accent); }
+
+.stage-arrow {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  transition: transform 0.18s ease;
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.stage-header.collapsed .stage-arrow { transform: rotate(-90deg); }
+
+.stage-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.stage-reset-btn {
+  margin-left: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+  display: inline-block;
+  line-height: 1;
+}
+.stage-header:hover .stage-reset-btn { opacity: 1; }
+.stage-reset-btn:hover { color: var(--warn); }
+
+.stage-progress {
+  width: 100%;
+  height: 1px;
+  background: var(--border-light);
+  margin-bottom: 2px;
+}
+
+.stage-progress-bar {
+  height: 100%;
+  background: var(--done);
+  transition: width 0.3s ease;
+}
+
+.stage-items { overflow: hidden; }
+.stage-header.collapsed ~ .stage-items { display: none; }
+.stage-header.collapsed ~ .stage-progress { display: none; }
+
+.lesson-node {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px 6px 32px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12.5px;
+  color: var(--text);
+  transition: background 0.1s, color 0.1s;
+  position: relative;
+  gap: 8px;
+}
+
+.lesson-node:hover { background: rgba(255, 255, 255, 0.05); }
+.lesson-node.active {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--accent-hover);
+  border-left: 2px solid var(--accent);
+  padding-left: 30px;
+}
+
+.lesson-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-dim);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  transition: all 0.15s;
+}
+
+.lesson-node.completed .lesson-check {
+  border-color: var(--done);
+  background: var(--done);
+  color: var(--bg);
+}
+
+.lesson-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-source {
+  font-size: 9px;
+  color: var(--text-muted);
+  flex-shrink: 1;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 0.15s, max-width 0.15s;
+}
+
+.lesson-node:hover .lesson-source,
+.lesson-node.active .lesson-source {
+  opacity: 1;
+  max-width: 200px;
+}
+
+.lesson-star {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--star);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.lesson-node.starred .lesson-star,
+.lesson-node:hover .lesson-star { opacity: 1; }
+
+.lesson-node.hidden-search { display: none; }
+
+/* ============================================================
+   Sidebar — Footer
+   ============================================================ */
+.sidebar-footer {
+  padding: 8px 16px;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sidebar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.sidebar-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.sidebar-btn.active { color: var(--accent-hover); background: rgba(255, 255, 255, 0.06); }
+
+[data-theme="light"] .sidebar-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .sidebar-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.goal-display {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   Main — Top Bar
+   ============================================================ */
+.main-topbar {
+  display: flex;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--glass-border);
+  gap: 16px;
+  min-height: 44px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.current-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.main-topbar-spacer { flex: 1; }
+
+.stats-group {
+  display: flex;
+  gap: 20px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.stats-group span { white-space: nowrap; }
+
+.speed-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 4px 8px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.speed-select:hover { color: var(--accent); border-color: rgba(255, 255, 255, 0.12); }
+.speed-select:focus { background: rgba(255, 255, 255, 0.08); }
+
+[data-theme="light"] .speed-select {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .speed-select:hover { border-color: rgba(0, 0, 0, 0.12); }
+
+/* ============================================================
+   Main — Content Area
+   ============================================================ */
+#content-area {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* Player column */
+#player-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#player-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  position: relative;
+  min-height: 0;
+  border-radius: 0 0 8px 0;
+  overflow: hidden;
+  margin: 0 0 0 0;
+}
+
+#player-wrap video {
+  max-width: 100%;
+  max-height: 100%;
+  outline: none;
+}
+
+.player-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+}
+
+.player-empty h3 {
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 4px;
+  color: var(--text-secondary);
+}
+
+.player-empty p { font-size: 12px; }
+
+.playlist-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-top: 1px solid var(--glass-border);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.pl-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+.pl-btn:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.16); background: rgba(255, 255, 255, 0.08); }
+
+/* Silent AI progress bar */
+.ai-silent-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(96, 165, 250, 0.06);
+  border-top: 1px solid rgba(96, 165, 250, 0.12);
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+.ai-silent-label {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  min-width: 60px;
+}
+.ai-silent-pct {
+  color: var(--accent);
+  font-weight: 600;
+  min-width: 30px;
+  text-align: right;
+}
+.ai-silent-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.ai-silent-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #60a5fa, #818cf8);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+[data-theme="light"] .pl-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .pl-btn:hover { border-color: rgba(0, 0, 0, 0.16); background: rgba(0, 0, 0, 0.05); }
+.pl-info { color: var(--text-muted); min-width: 36px; text-align: center; }
+.pl-name { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+
+.player-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 30, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 11px;
+  padding: 4px 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-family: var(--font-mono);
+}
+
+#player-wrap:hover .player-overlay { opacity: 0.9; }
+
+/* Notes column */
+#notes-col {
+  width: 360px;
+  min-width: 200px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-left: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.notes-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.notes-header .title { flex: 1; font-weight: 600; }
+
+.notes-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--text);
+  user-select: text;
+}
+
+.notes-content p { margin-bottom: 8px; }
+.notes-content h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 400;
+  margin: 16px 0 6px;
+  color: var(--accent);
+}
+
+.annotation-highlight {
+  background: var(--star-bg);
+  border-bottom: 1.5px solid var(--star);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.annotation-highlight:hover { filter: brightness(1.2); }
+
+.annotation-popup {
+  position: fixed;
+  background: rgba(28, 28, 38, 0.85);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 11px;
+  max-width: 220px;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
+  pointer-events: auto;
+}
+
+[data-theme="light"] .annotation-popup {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,.1);
+}
+
+.annotation-popup input {
+  width: 100%;
+  background: var(--bg);
+  border: none;
+  color: var(--text);
+  padding: 4px 6px;
+  font-size: 11px;
+  margin-top: 4px;
+  outline: none;
+}
+
+.annotation-popup .btn-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.annotation-popup button {
+  flex: 1;
+  background: var(--surface-hover);
+  border: none;
+  color: var(--text);
+  font-size: 10px;
+  padding: 3px 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.annotation-popup button:hover { background: var(--border); }
+
+/* ============================================================
+   Dashboard Panel
+   ============================================================ */
+#dashboard-panel {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(12, 12, 20, 0.75);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  z-index: 5;
+  display: none;
+  flex-direction: column;
+  padding: 40px 60px;
+  overflow-y: auto;
+}
+
+[data-theme="light"] #dashboard-panel {
+  background: rgba(248, 247, 243, 0.78);
+}
+
+#dashboard-panel.visible { display: flex; }
+
+.dash-close {
+  position: sticky;
+  top: 8px;
+  z-index: 10;
+  align-self: flex-end;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.dash-close:hover {
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+[data-theme="light"] .dash-close {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+[data-theme="light"] .dash-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.14);
+}
+
+.dash-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.dash-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 700px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   Continue Watching Bar
+   ============================================================ */
+.continue-watching {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 99,102,241), 0.12), rgba(var(--accent-rgb, 99,102,241), 0.06));
+  border: 1px solid rgba(var(--accent-rgb, 99,102,241), 0.18);
+  border-radius: 10px;
+  margin: 0 0 10px 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+.continue-watching:hover {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 99,102,241), 0.2), rgba(var(--accent-rgb, 99,102,241), 0.1));
+  border-color: rgba(var(--accent-rgb, 99,102,241), 0.3);
+}
+.continue-watching.visible { display: flex; }
+.continue-watching-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--accent-rgb, 99,102,241), 0.15);
+  border-radius: 8px;
+}
+.continue-watching-info { flex: 1; min-width: 0; }
+.continue-watching-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.continue-watching-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.continue-watching-progress {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.continue-watching-close {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.continue-watching-close:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+
+/* ============================================================
+   Watch History List (Dashboard)
+   ============================================================ */
+.history-list { display: flex; flex-direction: column; gap: 6px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.history-item:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.1);
+}
+[data-theme="light"] .history-item {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .history-item:hover {
+  background: rgba(0,0,0,0.05);
+}
+.history-item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--accent-rgb, 99,102,241), 0.1);
+  border-radius: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.history-item-info { flex: 1; min-width: 0; }
+.history-item-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.history-item-progress {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+}
+.history-empty {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+
+/* ============================================================
+   AI Summary Panel
+   ============================================================ */
+#ai-summary-panel {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  z-index: 6;
+  display: none;
+  flex-direction: column;
+  padding: 40px 60px;
+  overflow-y: auto;
+}
+
+#ai-summary-panel.visible { display: flex; }
+
+.ai-summary-close {
+  position: sticky;
+  top: 8px;
+  z-index: 10;
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ai-summary-close:hover { color: var(--accent); }
+
+.ai-summary-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.ai-summary-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.ai-summary-progress {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+}
+
+.ai-progress-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.ai-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.ai-progress-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.ai-summary-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 40px 0;
+}
+
+.ai-summary-section-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--accent);
+  margin: 32px 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-summary-block {
+  margin-bottom: 20px;
+}
+
+.ai-summary-block h4 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.ai-summary-block ul {
+  list-style: none;
+  padding: 0;
+}
+
+.ai-summary-block li {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 0 4px 16px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.ai-summary-block li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.4;
+}
+
+.ai-summary-oneliner {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text);
+  font-style: italic;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+}
+
+/* AI-generated quiz questions inside summary panel */
+.ai-question {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.ai-question .ai-q-text {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.ai-question .ai-q-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.ai-option {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ai-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
+}
+
+.ai-option.selected {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-option.correct {
+  border-color: var(--done);
+  background: var(--done-bg);
+  color: var(--done);
+}
+
+.ai-option.wrong {
+  border-color: var(--warn);
+  background: rgba(212, 112, 80, 0.1);
+}
+
+.ai-feedback {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.ai-feedback.correct {
+  color: var(--done);
+  background: var(--done-bg);
+}
+
+.ai-feedback.wrong {
+  color: var(--warn);
+  background: rgba(212, 112, 80, 0.1);
+}
+
+.btn-ai-submit {
+  background: var(--accent);
+  border: none;
+  color: var(--bg);
+  font-size: 11px;
+  font-family: var(--font-ui);
+  padding: 4px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.btn-ai-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ai-answer-reveal {
+  font-size: 12px;
+  color: var(--done);
+  margin-top: 6px;
+}
+
+.ai-q-type {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.ai-source-link {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.ai-source-link:hover {
+  color: #fbbf24;
+}
+
+/* Quiz action buttons */
+.btn-ai-quiz-action {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  margin: 12px 0 16px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed var(--border-light);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ai-quiz-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Quiz count picker */
+.quiz-count-picker {
+  margin: 12px 0 16px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.quiz-count-title {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.quiz-count-options {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.quiz-count-opt {
+  flex: 1;
+  padding: 10px 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quiz-count-opt:hover {
+  border-color: var(--accent);
+}
+.quiz-count-opt.selected {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+.quiz-count-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+.quiz-count-cancel {
+  padding: 6px 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+.quiz-count-cancel:hover { color: var(--text); }
+
+/* ============================================================
+   Confirmation Toast
+   ============================================================ */
+.toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 42, 0.85);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 20px;
+  font-size: 12px;
+  z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  max-width: 90vw;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+[data-theme="light"] .toast {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 24px rgba(0,0,0,.1);
+}
+
+.toast.show { opacity: 1; pointer-events: auto; }
+
+.toast button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+  color: var(--text);
+  padding: 5px 14px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+.toast button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+[data-theme="light"] .toast button {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--text);
+}
+[data-theme="light"] .toast button:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+
+.toast button.confirm { background: var(--done); color: var(--bg); }
+
+/* ============================================================
+   Resize Handle
+   ============================================================ */
+#resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+}
+
+#resize-handle:hover,
+#resize-handle.active { background: var(--border); }
+
+/* ============================================================
+   Utility / Animations
+   ============================================================ */
+@keyframes skeleton-pulse {
+  0% { background: var(--skeleton); }
+  50% { background: var(--skeleton-shine); }
+  100% { background: var(--skeleton); }
+}
+
+.skeleton {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+.fade-in { animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+#notes-resize-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+}
+
+#notes-resize-handle:hover,
+#notes-resize-handle.active { background: var(--border); }
+
+#notes-col { position: relative; }
+
+/* ============================================================
+   Context Menu
+   ============================================================ */
+.ctx-menu {
+  position: fixed;
+  z-index: 9999;
+  min-width: 160px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.ctx-item {
+  padding: 9px 18px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.ctx-item:hover {
+  background: rgba(255,255,255,0.08);
+  color: var(--accent-hover);
+}
+
+.ctx-item.ctx-danger {
+  color: var(--warn);
+}
+
+.ctx-item.ctx-danger:hover {
+  background: rgba(212,112,80,0.15);
+}
+
+[data-theme="light"] .ctx-menu {
+  background: rgba(255,255,255,0.94);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .ctx-item:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+/* ============================================================
+   Starred Chips
+   ============================================================ */
+.starred-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  margin-bottom: 6px;
+}
+
+.starred-chip:hover {
+  background: var(--surface-hover);
+  border-color: rgba(255,255,255,0.14);
+  transform: translateY(-1px);
+}
+
+.starred-chip-icon {
+  font-size: 14px;
+  color: var(--star);
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.starred-chip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.starred-chip-name {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.starred-chip-stage {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+[data-theme="light"] .starred-chip {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.06);
+}
+
+[data-theme="light"] .starred-chip:hover {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   Dashboard Polish
+   ============================================================ */
+#dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.dash-card {
+  padding: 20px 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dash-card::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: rgba(255,255,255,0.12);
+  transition: background 0.3s ease;
+}
+
+.dash-card:nth-child(1)::after { background: rgba(140,160,255,0.45); }
+.dash-card:nth-child(2)::after { background: rgba(255,200,100,0.40); }
+.dash-card:nth-child(3)::after { background: rgba(120,200,140,0.40); }
+.dash-card:nth-child(4)::after { background: rgba(200,150,220,0.40); }
+
+.dash-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.dash-card-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.dash-card-value {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--accent-hover);
+  line-height: 1.1;
+}
+
+.dash-card-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.dash-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin: 32px 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="light"] .dash-section-title {
+  border-bottom-color: rgba(0,0,0,0.07);
+}
+
+.stage-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.stage-progress-name {
+  width: 130px;
+  font-size: 12px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.stage-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stage-progress-fill {
+  height: 100%;
+  background: var(--done);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px rgba(90,154,90,0.3);
+}
+
+.stage-progress-pct {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  width: 36px;
+  text-align: right;
+}
+
+[data-theme="light"] .stage-progress-track {
+  background: rgba(0,0,0,0.05);
+}
+
+[data-theme="light"] .dash-card {
+  background: rgba(0,0,0,0.025);
+  border-color: rgba(0,0,0,0.06);
+}
+
+#starred-list {
+  padding-bottom: 40px;
+}
+
+/* ============================================================
+   Goal Input & Mode Tabs
+   ============================================================ */
+.goal-input-wrap {
+  margin-bottom: 4px;
+}
+
+.goal-mode-tabs {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.goal-mode-btn {
+  padding: 7px 20px;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.goal-mode-btn:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.goal-mode-btn.active {
+  background: var(--accent);
+  color: #111;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+[data-theme="light"] .goal-mode-btn.active {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.goal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.goal-row.hidden { display: none; }
+
+.goal-prefix {
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.goal-suffix {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+#goal-input, #goal-duration-input {
+  width: 72px;
+  padding: 9px 12px;
+  font-size: 15px;
+  font-family: var(--font-mono);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  -moz-appearance: textfield;
+}
+
+#goal-input::-webkit-inner-spin-button,
+#goal-input::-webkit-outer-spin-button,
+#goal-duration-input::-webkit-inner-spin-button,
+#goal-duration-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#goal-input:focus, #goal-duration-input:focus {
+  border-color: rgba(160,180,255,0.5);
+  box-shadow: 0 0 0 3px rgba(160,180,255,0.12);
+}
+
+[data-theme="light"] #goal-input,
+[data-theme="light"] #goal-duration-input {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+}
+
+[data-theme="light"] #goal-input:focus,
+[data-theme="light"] #goal-duration-input:focus {
+  border-color: rgba(60,80,180,0.4);
+  box-shadow: 0 0 0 3px rgba(60,80,180,0.08);
+}
+
+.btn-save-goal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(135deg, #5b6af0 0%, #4a54e0 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(91,106,240,0.3);
+}
+
+.btn-save-goal:hover {
+  background: linear-gradient(135deg, #6b7af8 0%, #5560ec 100%);
+  box-shadow: 0 4px 14px rgba(91,106,240,0.4);
+  transform: translateY(-1px);
+}
+
+.btn-save-goal:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(91,106,240,0.25);
+}
+
+[data-theme="light"] .btn-save-goal {
+  background: linear-gradient(135deg, #4f5bd5 0%, #3d49c0 100%);
+  box-shadow: 0 2px 8px rgba(79,91,213,0.25);
+}
+
+/* ============================================================
+   Reset Section — Danger Zone
+   ============================================================ */
+.reset-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.reset-btn {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-family: var(--font-ui);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: var(--surface-hover);
+  border-color: rgba(255,255,255,0.16);
+  transform: translateY(-1px);
+}
+
+.reset-btn:active {
+  transform: translateY(0);
+}
+
+.reset-btn-danger {
+  color: var(--warn);
+  border-color: rgba(212,112,80,0.3);
+  background: rgba(212,112,80,0.08);
+}
+
+.reset-btn-danger:hover {
+  background: rgba(212,112,80,0.18);
+  border-color: rgba(212,112,80,0.5);
+}
+
+[data-theme="light"] .reset-btn {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+  color: #333;
+}
+
+[data-theme="light"] .reset-btn:hover {
+  background: #f5f5f5;
+  border-color: rgba(0,0,0,0.18);
+}
+
+[data-theme="light"] .reset-btn-danger {
+  color: #d44;
+  border-color: rgba(220,60,40,0.3);
+  background: rgba(220,60,40,0.04);
+}
+
+[data-theme="light"] .reset-btn-danger:hover {
+  background: rgba(220,60,40,0.1);
+  border-color: rgba(220,60,40,0.5);
+}
+</style>
+</head>
+<body>
+<!-- ── Fluid Gradient Background ── -->
+<div class="bg-layer">
+  <div class="bg-blob a"></div>
+  <div class="bg-blob b"></div>
+  <div class="bg-blob c"></div>
+  <div class="bg-blob d"></div>
+</div>
+<div class="bg-noise"></div>
+
+
+<div id="app">
+  <!-- ====== SIDEBAR ====== -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title-row">
+        <div class="sidebar-title">AI 学习平台</div>
+        <button class="sidebar-btn sidebar-collapse-btn" id="btn-collapse-sidebar" title="收起侧边栏">◀</button>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">&#9906;</span>
+        <input type="text" id="search-input" placeholder="搜索课程..." autocomplete="off">
+      </div>
+    </div>
+
+    <nav id="tree-container"></nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-actions">
+        <button class="sidebar-btn" id="btn-theme" title="切换暗色/浅色模式">&#9788;</button>
+        <button class="sidebar-btn" id="btn-dashboard" title="进度仪表盘">&#9776;</button>
+        <button class="sidebar-btn" id="btn-starred" title="收藏列表">&#9733;</button>
+        <button class="sidebar-btn" id="btn-ai-summary" title="AI 总结">&#9881;</button>
+      </div>
+      <div class="goal-display" id="goal-display"></div>
+    </div>
+  </aside>
+
+  <!-- ====== MAIN ====== -->
+  <main id="main">
+    <div class="main-topbar">
+      <span class="current-title" id="current-title">选择一节课程开始</span>
+      <span class="main-topbar-spacer"></span>
+      <button class="sidebar-btn" id="btn-toggle-notes-top" title="显示/隐藏笔记">&#9998;</button>
+      <div class="stats-group">
+        <span id="stat-today">今日 0m</span>
+        <span id="stat-week">本周 0h</span>
+        <span id="stat-total">总计 0h</span>
+      </div>
+      <select class="speed-select" id="speed-select">
+        <option value="1">1×</option>
+        <option value="1.25">1.25×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </div>
+
+    <div id="content-area" style="position:relative;">
+      <div id="player-col">
+        <div class="continue-watching" id="continue-watching">
+          <div class="continue-watching-icon">&#9654;</div>
+          <div class="continue-watching-info">
+            <div class="continue-watching-label">上次观看</div>
+            <div class="continue-watching-name" id="cw-name"></div>
+          </div>
+          <div class="continue-watching-progress" id="cw-progress"></div>
+          <button class="continue-watching-close" id="cw-close" title="关闭">&times;</button>
+        </div>
+        <div id="player-wrap">
+          <div class="player-empty">
+            <h3>AI 学习平台</h3>
+            <p>左侧选择课程开始学习</p>
+          </div>
+          <video id="video-player" controls style="display:none;"></video>
+          <div class="player-overlay" id="player-overlay"></div>
+        </div>
+        <div class="playlist-bar" id="playlist-bar" style="display:none;">
+          <button class="pl-btn" id="btn-pl-prev" title="上一集">◀</button>
+          <span class="pl-info" id="pl-info">1 / 1</span>
+          <button class="pl-btn" id="btn-pl-next" title="下一集">▶</button>
+          <span class="pl-name" id="pl-name"></span>
+          <button class="pl-btn" id="btn-ai-analyze" title="AI 总结当前视频" style="margin-left:auto;">AI 总结</button>
+          <button class="pl-btn" id="btn-ai-silent" title="后台静默分析，完成后通知">后台</button>
+        </div>
+        <div class="ai-silent-progress" id="ai-silent-progress" style="display:none;">
+          <span class="ai-silent-label" id="ai-silent-label">AI 分析中</span>
+          <div class="ai-silent-track">
+            <div class="ai-silent-fill" id="ai-silent-fill"></div>
+          </div>
+          <span class="ai-silent-pct" id="ai-silent-pct">0%</span>
+        </div>
+      </div>
+
+      <div id="notes-col">
+        <div class="notes-header">
+          <span class="title">笔记</span>
+          <button class="sidebar-btn" id="btn-toggle-notes" title="收起笔记面板">&#8594;</button>
+        </div>
+        <div class="notes-content" id="notes-content">
+          <p style="color:var(--text-muted)">选择课程后，对应笔记会显示在这里</p>
+        </div>
+        <div id="notes-resize-handle"></div>
+      </div>
+
+      <!-- Dashboard overlay -->
+      <div id="dashboard-panel">
+        <button class="dash-close" id="btn-dash-close">&times;</button>
+        <div class="dash-title">学习进度</div>
+        <div class="dash-grid" id="dash-cards"></div>
+        <div class="dash-section-title">每日目标</div>
+        <div class="goal-input-wrap">
+          <div class="goal-mode-tabs">
+            <button class="goal-mode-btn active" data-mode="lessons">按节数</button>
+            <button class="goal-mode-btn" data-mode="duration">按时长</button>
+          </div>
+          <div class="goal-row" id="goal-lessons-row">
+            <span class="goal-prefix">每天完成</span>
+            <input type="number" id="goal-input" min="1" max="99" value="5">
+            <span class="goal-suffix">节</span>
+          </div>
+          <div class="goal-row hidden" id="goal-duration-row">
+            <span class="goal-prefix">每天学习</span>
+            <input type="number" id="goal-duration-input" min="10" max="600" step="5" value="60">
+            <span class="goal-suffix">分钟</span>
+          </div>
+          <button class="btn-save-goal" id="btn-set-goal">保存设置</button>
+        </div>
+        <div class="dash-section-title">重置进度</div>
+        <div class="reset-section">
+          <button class="reset-btn" id="btn-reset-completed">重置所有已完成</button>
+          <button class="reset-btn" id="btn-reset-watchtime">清空观看时长</button>
+          <button class="reset-btn" id="btn-reset-positions">清空播放位置</button>
+          <button class="reset-btn reset-btn-danger" id="btn-reset-all">全部重置</button>
+        </div>
+        <div class="dash-section-title">各阶段进度</div>
+        <div id="stage-progress-list"></div>
+        <div class="dash-section-title">收藏列表</div>
+        <div id="starred-list"></div>
+        <div class="dash-section-title">观看历史</div>
+        <div class="history-list" id="history-list"></div>
+      </div>
+
+      <!-- AI Summary overlay -->
+      <div id="ai-summary-panel">
+        <button class="ai-summary-close" id="btn-ai-summary-close">&times;</button>
+        <div class="ai-summary-title">AI 视频总结</div>
+        <div class="ai-summary-subtitle">语音识别 → AI 总结 + 出题</div>
+        <div class="ai-summary-progress" id="ai-summary-progress" style="display:none;">
+          <div class="ai-progress-bar"><div class="ai-progress-fill" id="ai-progress-fill"></div></div>
+          <div class="ai-progress-text" id="ai-progress-text"></div>
+        </div>
+        <div id="ai-summary-content">
+          <div class="ai-summary-empty">点击播放栏「AI 总结」按钮或侧边栏齿轮图标开始分析当前视频</div>
+        </div>
+        <div class="ai-summary-section-title">AI 出题</div>
+        <div id="ai-quiz-list"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ============================================================
+// DATA — Loaded from external course-data.json
+// ============================================================
+let COURSE_TREE = [];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  completed: new Set(),       // lesson ids
+  starred: new Set(),         // lesson ids
+  annotations: {},            // lesson_id -> [{text, tag, timestamp}]
+  summaries: {},              // lesson_id -> {summary, questions, transcript, timestamp}
+  playPositions: {},          // lesson_id -> seconds
+  watchTime: {},              // date 'YYYY-MM-DD' -> seconds
+  watchHistory: [],           // [{lessonId, lessonName, stageName, timestamp, progress, videoSrc, playlistIdx}]
+  goal: 5,                    // daily goal (lessons)
+  goalMode: 'lessons',        // 'lessons' | 'duration'
+  goalMinutes: 60,            // daily goal (minutes)
+  currentLesson: null,
+  speed: 1,
+  theme: 'dark',
+  notesVisible: true,
+  stagesCollapsed: {},
+};
+
+// ============================================================
+// PERSISTENCE
+// ============================================================
+function loadState() {
+  try {
+    const raw = localStorage.getItem('learn_state');
+    if (raw) {
+      const s = JSON.parse(raw);
+      state.completed = new Set(s.completed || []);
+      state.starred = new Set(s.starred || []);
+      state.annotations = s.annotations || {};
+      state.summaries = s.summaries || {};
+      state.playPositions = s.playPositions || {};
+      state.watchTime = s.watchTime || {};
+      state.watchHistory = s.watchHistory || [];
+      state.goal = s.goal || 5;
+      state.goalMode = s.goalMode || 'lessons';
+      state.goalMinutes = s.goalMinutes || 60;
+      state.theme = s.theme || 'dark';
+      state.notesVisible = s.notesVisible !== false;
+      state.stagesCollapsed = s.stagesCollapsed || {};
+      state.sidebarCollapsed = s.sidebarCollapsed || false;
+    }
+    // Merge server-stored summaries as additional backup
+    fetch('/api/summaries').then(r => r.json()).then(serverData => {
+      if (serverData && typeof serverData === 'object' && !serverData.error) {
+        for (const [k, v] of Object.entries(serverData)) {
+          if (!state.summaries[k]) state.summaries[k] = v;
+        }
+        saveState();
+      }
+    }).catch(() => {});
+  } catch(e) { console.warn('加载本地状态失败:', e.message); }
+}
+
+function saveState() {
+  const s = {
+    completed: [...state.completed],
+    starred: [...state.starred],
+    annotations: state.annotations,
+    summaries: state.summaries,
+    playPositions: state.playPositions,
+    watchTime: state.watchTime,
+    watchHistory: state.watchHistory,
+    goal: state.goal,
+    goalMode: state.goalMode,
+    goalMinutes: state.goalMinutes,
+    theme: state.theme,
+    notesVisible: state.notesVisible,
+    stagesCollapsed: state.stagesCollapsed,
+    sidebarCollapsed: state.sidebarCollapsed,
+  };
+  localStorage.setItem('learn_state', JSON.stringify(s));
+  // Also persist summaries to server file as backup
+  if (Object.keys(state.summaries).length) {
+    fetch('/api/summaries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state.summaries)
+    }).catch(() => {});
+  }
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function escapeHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+function todayKey() { return new Date().toISOString().slice(0,10); }
+function weekStart() { const d = new Date(); d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1)); return d.toISOString().slice(0,10); }
+function totalLessons() { return COURSE_TREE.reduce((s, st) => s + st.lessons.length, 0); }
+function completedCount() { return state.completed.size; }
+function todayCompleted() {
+  const tk = todayKey();
+  let c = 0;
+  for (const id of state.completed) c += (state.annotations[id]?.completedDate === tk) ? 1 : 0;
+  return c;
+}
+function todayWatchSeconds() { return state.watchTime[todayKey()] || 0; }
+function weekWatchSeconds() {
+  let total = 0;
+  const ws = weekStart();
+  for (const [k, v] of Object.entries(state.watchTime)) { if (k >= ws) total += v; }
+  return total;
+}
+function totalWatchSeconds() { return Object.values(state.watchTime).reduce((a,b)=>a+b, 0); }
+function fmtDuration(sec) {
+  if (sec < 60) return Math.floor(sec) + 's';
+  if (sec < 3600) return Math.floor(sec/60) + 'm';
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  return h + 'h' + (m ? ' ' + m + 'm' : '');
+}
+function stageProgress(stage) {
+  const done = stage.lessons.filter(l => state.completed.has(l.id)).length;
+  return { done, total: stage.lessons.length, pct: Math.round(done / stage.lessons.length * 100) };
+}
+
+// ============================================================
+// RENDER — Tree
+// ============================================================
+const treeContainer = document.getElementById('tree-container');
+
+function renderTree(filter = '') {
+  treeContainer.innerHTML = '';
+  const filterLower = filter.toLowerCase();
+
+  COURSE_TREE.forEach((stage, si) => {
+    const collapsed = state.stagesCollapsed[stage.id] || false;
+    const { done, total, pct } = stageProgress(stage);
+
+    const stageDiv = document.createElement('div');
+    stageDiv.className = 'tree-stage';
+
+    const header = document.createElement('div');
+    header.className = 'stage-header' + (collapsed ? ' collapsed' : '');
+    header.innerHTML = `<span class="stage-arrow">&#9660;</span>${stage.name}<span class="stage-count">${done}/${total}</span><span class="stage-reset-btn" data-stage-id="${stage.id}" title="重置此阶段">&#8634;</span>`;
+    header.addEventListener('click', () => {
+      state.stagesCollapsed[stage.id] = !state.stagesCollapsed[stage.id];
+      saveState();
+      renderTree(filter);
+    });
+    stageDiv.appendChild(header);
+
+    const pbWrap = document.createElement('div');
+    pbWrap.className = 'stage-progress';
+    const pbBar = document.createElement('div');
+    pbBar.className = 'stage-progress-bar';
+    pbBar.style.width = pct + '%';
+    pbWrap.appendChild(pbBar);
+    stageDiv.appendChild(pbWrap);
+
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'stage-items';
+
+    stage.lessons.forEach(lesson => {
+      const node = document.createElement('div');
+      node.className = 'lesson-node';
+      node.dataset.lessonId = lesson.id;
+      if (state.completed.has(lesson.id)) node.classList.add('completed');
+      if (state.starred.has(lesson.id)) node.classList.add('starred');
+      if (state.currentLesson === lesson.id) node.classList.add('active');
+
+      const nameMatch = lesson.name.toLowerCase().includes(filterLower);
+      if (filter && !nameMatch) node.classList.add('hidden-search');
+
+      node.innerHTML = `
+        <span class="lesson-check">&#10003;</span>
+        <span class="lesson-name">${lesson.name}</span>
+        <span class="lesson-star">&#9733;</span>
+        <span class="lesson-source">${lesson.source}</span>
+      `;
+
+      node.addEventListener('click', (e) => {
+        // Star on star icon click
+        if (e.target.closest('.lesson-star')) {
+          if (state.starred.has(lesson.id)) state.starred.delete(lesson.id);
+          else state.starred.add(lesson.id);
+          saveState();
+          renderTree(filter);
+          return;
+        }
+        selectLesson(lesson);
+      });
+
+      itemsDiv.appendChild(node);
+    });
+
+    stageDiv.appendChild(itemsDiv);
+    treeContainer.appendChild(stageDiv);
+  });
+}
+
+// ============================================================
+// RENDER — Dashboard
+// ============================================================
+function renderDashboard() {
+  const total = totalLessons();
+  const done = completedCount();
+  const todayDone = todayCompleted();
+  const todayWatch = todayWatchSeconds();
+  const weekWatch = weekWatchSeconds();
+  const totalWatch = totalWatchSeconds();
+
+  const isDuration = state.goalMode === 'duration';
+  const goalLabel = isDuration ? `目标 ${state.goalMinutes} 分钟/天` : `目标 ${state.goal} 节/天`;
+  const todayProgress = isDuration
+    ? `${fmtDuration(todayWatch)}<span style="font-size:14px"> / ${state.goalMinutes}分</span>`
+    : `${todayDone}<span style="font-size:14px">/${state.goal}</span>`;
+
+  document.getElementById('dash-cards').innerHTML = `
+    <div class="dash-card">
+      <div class="dash-card-label">总进度</div>
+      <div class="dash-card-value">${Math.round(done/total*100)}%</div>
+      <div class="dash-card-sub">${done} / ${total} 节已完成</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">今日进度</div>
+      <div class="dash-card-value">${todayProgress}</div>
+      <div class="dash-card-sub">${goalLabel}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">今日完成</div>
+      <div class="dash-card-value">${todayDone}</div>
+      <div class="dash-card-sub">${fmtDuration(todayWatch)} · 本周 ${fmtDuration(weekWatch)} · 总计 ${fmtDuration(totalWatch)}</div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-label">收藏</div>
+      <div class="dash-card-value">${state.starred.size}</div>
+      <div class="dash-card-sub">节已收藏</div>
+    </div>
+  `;
+
+  // Stage progress
+  const spl = document.getElementById('stage-progress-list');
+  spl.innerHTML = '';
+  COURSE_TREE.forEach(stage => {
+    const { done, total, pct } = stageProgress(stage);
+    spl.innerHTML += `
+      <div class="stage-progress-row">
+        <span class="stage-progress-name">${stage.name}</span>
+        <div class="stage-progress-track"><div class="stage-progress-fill" style="width:${pct}%"></div></div>
+        <span class="stage-progress-pct">${pct}%</span>
+      </div>
+    `;
+  });
+
+  // Starred list
+  const sl = document.getElementById('starred-list');
+  sl.innerHTML = '';
+  for (const sid of state.starred) {
+    const lesson = findLesson(sid);
+    if (!lesson) continue;
+    const stageName = findStageName(sid) || '';
+
+    const chip = document.createElement('span');
+    chip.className = 'starred-chip';
+
+    const icon = document.createElement('span');
+    icon.className = 'starred-chip-icon';
+    icon.textContent = state.completed.has(sid) ? '\u2714' : '\u2605';
+
+    const info = document.createElement('span');
+    info.className = 'starred-chip-info';
+
+    const nameEl = document.createElement('span');
+    nameEl.className = 'starred-chip-name';
+    nameEl.textContent = lesson.name;
+
+    const stageEl = document.createElement('span');
+    stageEl.className = 'starred-chip-stage';
+    stageEl.textContent = stageName;
+
+    info.appendChild(nameEl);
+    if (stageName) info.appendChild(stageEl);
+    chip.appendChild(icon);
+    chip.appendChild(info);
+
+    chip.addEventListener('click', () => selectLesson(lesson));
+    chip.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      state.starred.delete(sid);
+      saveState();
+      renderTree(document.getElementById('search-input').value);
+      renderDashboard();
+    });
+    sl.appendChild(chip);
+  }
+  if (state.starred.size === 0) sl.innerHTML = '<span style="font-size:11px;color:var(--text-muted)">暂无收藏</span>';
+
+  // Watch history
+  const hl = document.getElementById('history-list');
+  hl.innerHTML = '';
+  if (state.watchHistory.length === 0) {
+    hl.innerHTML = '<div class="history-empty">暂无观看记录</div>';
+  } else {
+    const now = Date.now();
+    for (const h of state.watchHistory.slice(0, 20)) {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      // Relative time
+      const diff = now - h.timestamp;
+      let timeStr;
+      if (diff < 60000) timeStr = '刚刚';
+      else if (diff < 3600000) timeStr = Math.floor(diff / 60000) + '分钟前';
+      else if (diff < 86400000) timeStr = Math.floor(diff / 3600000) + '小时前';
+      else if (diff < 604800000) timeStr = Math.floor(diff / 86400000) + '天前';
+      else timeStr = new Date(h.timestamp).toLocaleDateString('zh-CN');
+
+      const completed = state.completed.has(h.lessonId);
+      item.innerHTML = `
+        <div class="history-item-icon">${completed ? '&#10004;' : '&#9654;'}</div>
+        <div class="history-item-info">
+          <div class="history-item-name">${escapeHtml(h.lessonName)}</div>
+          <div class="history-item-meta">${escapeHtml(h.stageName)} · ${timeStr}</div>
+        </div>
+        <div class="history-item-progress">${h.progress > 0 ? h.progress + '%' : ''}</div>
+      `;
+      item.addEventListener('click', () => {
+        const lesson = findLesson(h.lessonId);
+        if (lesson) {
+          selectLesson(lesson);
+          if (h.playlistIdx > 0 && state.currentPlaylist && h.playlistIdx < state.currentPlaylist.length) {
+            state.currentPlaylistIdx = h.playlistIdx;
+            playVideo(state.currentPlaylist[h.playlistIdx], h.playlistIdx, state.currentPlaylist.length, lesson.name);
+          }
+          dashboardPanel.classList.remove('visible');
+          renderContinueWatching();
+        }
+      });
+      hl.appendChild(item);
+    }
+  }
+
+  document.getElementById('goal-input').value = state.goal;
+  updateStats();
+}
+
+function findLesson(id) {
+  for (const stage of COURSE_TREE) {
+    for (const l of stage.lessons) {
+      if (l.id === id) return l;
+    }
+  }
+  return null;
+}
+
+function findStageName(id) {
+  for (const stage of COURSE_TREE) {
+    for (const l of stage.lessons) {
+      if (l.id === id) return stage.name;
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// LESSON SELECTION & VIDEO
+// ============================================================
+const videoPlayer = document.getElementById('video-player');
+const playerWrap = document.getElementById('player-wrap');
+const playerEmpty = playerWrap.querySelector('.player-empty');
+const playerOverlay = document.getElementById('player-overlay');
+const currentTitle = document.getElementById('current-title');
+const notesContent = document.getElementById('notes-content');
+let watchInterval = null;
+
+function selectLesson(lesson) {
+  state.currentLesson = lesson.id;
+  currentTitle.textContent = lesson.name;
+  renderTree(document.getElementById('search-input').value);
+
+  // Determine video source(s)
+  const videos = Array.isArray(lesson.video) ? lesson.video : [lesson.video];
+  state.currentPlaylist = videos;
+  state.currentPlaylistIdx = 0;
+
+  playVideo(videos[0], 0, videos.length, lesson.name);
+
+  // Show notes
+  notesContent.innerHTML = lesson.notes || '<p style="color:var(--text-muted)">暂无笔记</p>';
+  _currentAnnotationLessonId = lesson.id;
+
+  // Start watch tracking
+  startWatchTracking(lesson.id);
+
+  saveState();
+}
+
+function playVideo(src, idx, total, title) {
+  playerEmpty.style.display = 'none';
+  videoPlayer.style.display = 'block';
+  // Stop old tracking timer IMMEDIATELY to prevent stale currentTime writes
+  clearInterval(watchInterval);
+  watchInterval = null;
+
+  const lid = state.currentLesson;
+  // For playlist videos (idx > 0), always start from 0 since playPositions
+  // stores per-lesson (not per-video) and only the last video's position is meaningful
+  const savedPos = (idx === 0 && lid && state.playPositions[lid]) ? state.playPositions[lid] : 0;
+
+  // Pause and reset position before switching source
+  videoPlayer.pause();
+  videoPlayer.currentTime = 0;
+  videoPlayer.src = src;
+  videoPlayer.playbackRate = state.speed;
+
+  // Re-confirm position after metadata loads (catches browser cache carryover)
+  const onMeta = () => {
+    videoPlayer.currentTime = savedPos > 0 ? savedPos : 0;
+    videoPlayer.removeEventListener('loadedmetadata', onMeta);
+  };
+  videoPlayer.addEventListener('loadedmetadata', onMeta);
+
+  // Update title (unconditional, prevents stale title on auto-switch)
+  if (title !== undefined) currentTitle.textContent = title;
+
+  // Update playlist bar
+  const bar = document.getElementById('playlist-bar');
+  if (total > 1) {
+    bar.style.display = 'flex';
+    document.getElementById('pl-info').textContent = `${idx + 1} / ${total}`;
+    document.getElementById('pl-name').textContent = src.split('/').pop();
+    document.getElementById('btn-pl-prev').disabled = idx === 0;
+    document.getElementById('btn-pl-next').disabled = idx === total - 1;
+  } else {
+    bar.style.display = 'none';
+  }
+
+  // Record watch history
+  pushHistory(state.currentLesson);
+  renderContinueWatching();
+
+  videoPlayer.play().catch(() => {});
+}
+
+function playNextInPlaylist() {
+  const videos = state.currentPlaylist;
+  if (!videos) return false;
+  const nextIdx = (state.currentPlaylistIdx || 0) + 1;
+  if (nextIdx < videos.length) {
+    state.currentPlaylistIdx = nextIdx;
+    const lesson = findLesson(state.currentLesson);
+    playVideo(videos[nextIdx], nextIdx, videos.length, lesson ? lesson.name : '');
+    return true;
+  }
+  return false;
+}
+
+function playPrevInPlaylist() {
+  const videos = state.currentPlaylist;
+  if (!videos) return;
+  const prevIdx = (state.currentPlaylistIdx || 0) - 1;
+  if (prevIdx >= 0) {
+    state.currentPlaylistIdx = prevIdx;
+    playVideo(videos[prevIdx], prevIdx, videos.length);
+  }
+}
+
+function startWatchTracking(lessonId) {
+  if (watchInterval) clearInterval(watchInterval);
+  watchInterval = setInterval(() => {
+    const tk = todayKey();
+    state.watchTime[tk] = (state.watchTime[tk] || 0) + 5;
+    state.playPositions[lessonId] = videoPlayer.currentTime;
+    pushHistory(lessonId);  // Update history entry periodically
+    updateStats();
+    saveState();
+  }, 5000);
+}
+
+function pushHistory(lessonId) {
+  if (!lessonId) return;
+  const lesson = findLesson(lessonId);
+  if (!lesson) return;
+  const dur = videoPlayer.duration;
+  const progress = (dur && isFinite(dur) && dur > 0) ? Math.round((videoPlayer.currentTime / dur) * 100) : 0;
+  const entry = {
+    lessonId: lessonId,
+    lessonName: lesson.name,
+    stageName: findStageName(lessonId) || '',
+    timestamp: Date.now(),
+    progress: progress,
+    videoSrc: videoPlayer.src || '',
+    playlistIdx: state.currentPlaylistIdx || 0,
+  };
+  // Remove existing entry for this lesson (dedup)
+  state.watchHistory = state.watchHistory.filter(h => h.lessonId !== lessonId);
+  // Add to front (most recent)
+  state.watchHistory.unshift(entry);
+  // Cap at 50 entries
+  if (state.watchHistory.length > 50) state.watchHistory.length = 50;
+}
+
+function renderContinueWatching() {
+  const bar = document.getElementById('continue-watching');
+  if (!bar) return;
+  // Don't show if no history or if currently watching the last-watched lesson
+  const last = state.watchHistory.find(h => h.lessonId !== state.currentLesson);
+  if (!last) {
+    bar.classList.remove('visible');
+    return;
+  }
+  bar.classList.add('visible');
+  document.getElementById('cw-name').textContent = last.lessonName;
+  document.getElementById('cw-progress').textContent = last.progress > 0 ? last.progress + '%' : '';
+  // Click to jump
+  bar.onclick = (e) => {
+    if (e.target.closest('.continue-watching-close')) return;
+    const lesson = findLesson(last.lessonId);
+    if (lesson) {
+      selectLesson(lesson);
+      // Restore playlist position if it was on a specific video
+      if (last.playlistIdx > 0 && state.currentPlaylist && last.playlistIdx < state.currentPlaylist.length) {
+        state.currentPlaylistIdx = last.playlistIdx;
+        playVideo(state.currentPlaylist[last.playlistIdx], last.playlistIdx, state.currentPlaylist.length, lesson.name);
+      }
+      renderContinueWatching();
+    }
+  };
+}
+
+// Video events
+videoPlayer.addEventListener('ended', () => {
+  const lid = state.currentLesson;
+  if (!lid) return;
+
+  // Try next video in current playlist first
+  if (playNextInPlaylist()) return;
+
+  // Mark completed
+  state.completed.add(lid);
+  if (!state.annotations[lid]) state.annotations[lid] = {};
+  state.annotations[lid].completedDate = todayKey();
+
+  clearInterval(watchInterval);
+  saveState();
+  renderTree(document.getElementById('search-input').value);
+  updateStats();
+
+  // Auto-play next lesson
+  autoPlayNext();
+});
+
+function autoPlayNext() {
+  const currentLesson = findLesson(state.currentLesson);
+  if (!currentLesson) return;
+
+  let found = false;
+  for (const stage of COURSE_TREE) {
+    for (const lesson of stage.lessons) {
+      if (found) {
+        if (!state.completed.has(lesson.id)) {
+          selectLesson(lesson);
+          return;
+        }
+        continue;
+      }
+      if (lesson.id === currentLesson.id) found = true;
+    }
+  }
+  // All done
+  currentTitle.textContent = '全部课程已完成！';
+  playerEmpty.style.display = 'flex';
+  videoPlayer.style.display = 'none';
+}
+
+// Speed
+const speedSelect = document.getElementById('speed-select');
+speedSelect.addEventListener('change', () => {
+  state.speed = parseFloat(speedSelect.value);
+  videoPlayer.playbackRate = state.speed;
+  saveState();
+});
+
+// ============================================================
+// STATS
+// ============================================================
+function updateStats() {
+  document.getElementById('stat-today').textContent = '今日 ' + fmtDuration(todayWatchSeconds());
+  document.getElementById('stat-week').textContent = '本周 ' + fmtDuration(weekWatchSeconds());
+  document.getElementById('stat-total').textContent = '总计 ' + fmtDuration(totalWatchSeconds());
+  document.getElementById('goal-display').textContent = state.goalMode === 'duration'
+    ? fmtDuration(todayWatchSeconds()) + ' / ' + state.goalMinutes + ' 分钟'
+    : todayCompleted() + '/' + state.goal + ' 节';
+}
+
+// ============================================================
+// ANNOTATIONS
+// ============================================================
+let _currentAnnotationLessonId = null;
+
+// Bind mouseup listener ONCE — uses module-level _currentAnnotationLessonId
+notesContent.addEventListener('mouseup', (e) => {
+  if (!_currentAnnotationLessonId) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) return;
+  const text = sel.toString().trim();
+  if (!text) return;
+
+  const range = sel.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+
+  showAnnotationPopup(rect.left, rect.bottom + 4, text, _currentAnnotationLessonId, range);
+});
+
+function showAnnotationPopup(x, y, text, lessonId, range) {
+  // Remove existing popup
+  const existing = document.querySelector('.annotation-popup');
+  if (existing) existing.remove();
+
+  const popup = document.createElement('div');
+  popup.className = 'annotation-popup';
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.innerHTML = `
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">标注知识点</div>
+    <div style="font-size:11px;max-height:40px;overflow:hidden;">${escapeHtml(text.slice(0,60))}</div>
+    <input type="text" placeholder="标签（如：重点、面试高频）" id="ann-tag">
+    <div class="btn-row">
+      <button id="ann-save">保存</button>
+      <button id="ann-cancel">取消</button>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  popup.querySelector('#ann-cancel').addEventListener('click', () => popup.remove());
+  popup.querySelector('#ann-save').addEventListener('click', () => {
+    const tag = popup.querySelector('#ann-tag').value.trim() || '未分类';
+    if (!state.annotations[lessonId]) state.annotations[lessonId] = {};
+    if (!state.annotations[lessonId].marks) state.annotations[lessonId].marks = [];
+    state.annotations[lessonId].marks.push({
+      text: text,
+      tag: tag,
+      timestamp: videoPlayer.currentTime,
+      date: new Date().toISOString(),
+    });
+
+    // Highlight in notes
+    const span = document.createElement('span');
+    span.className = 'annotation-highlight';
+    span.textContent = text;
+    span.title = tag;
+    range.deleteContents();
+    range.insertNode(span);
+
+    saveState();
+    popup.remove();
+    window.getSelection().removeAllRanges();
+  });
+
+  // Click outside to close
+  setTimeout(() => {
+    const closeHandler = (e) => {
+      if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', closeHandler); }
+    };
+    document.addEventListener('click', closeHandler);
+  }, 0);
+}
+
+// ============================================================
+// UI ACTIONS
+// ============================================================
+
+// Theme toggle
+const btnTheme = document.getElementById('btn-theme');
+btnTheme.addEventListener('click', () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  saveState();
+});
+
+// Dashboard toggle
+const dashboardPanel = document.getElementById('dashboard-panel');
+document.getElementById('btn-dashboard').addEventListener('click', () => {
+  dashboardPanel.classList.toggle('visible');
+  if (dashboardPanel.classList.contains('visible')) renderDashboard();
+});
+document.getElementById('btn-dash-close').addEventListener('click', () => {
+  dashboardPanel.classList.remove('visible');
+});
+
+// AI Summary toggle
+const aiSummaryPanel = document.getElementById('ai-summary-panel');
+document.getElementById('btn-ai-summary').addEventListener('click', () => {
+  aiSummaryPanel.classList.toggle('visible');
+  if (aiSummaryPanel.classList.contains('visible') && state.currentLesson) {
+    const lesson = findLesson(state.currentLesson);
+    if (lesson && lesson.video && lesson.video.length > 0) {
+      startAISummary(lesson.video[0], lesson.name, getStageName(lesson.id));
+    }
+  }
+});
+document.getElementById('btn-ai-summary-close').addEventListener('click', () => {
+  aiSummaryPanel.classList.remove('visible');
+  convertPanelToSilent();
+});
+
+// AI Analyze button in playlist bar
+document.getElementById('btn-ai-analyze').addEventListener('click', () => {
+  if (!state.currentLesson) return;
+  const lesson = findLesson(state.currentLesson);
+  if (!lesson || !lesson.video || lesson.video.length === 0) return;
+  aiSummaryPanel.classList.add('visible');
+  startAISummary(lesson.video[0], lesson.name, getStageName(lesson.id));
+});
+
+// Silent background AI analysis
+document.getElementById('btn-ai-silent').addEventListener('click', () => {
+  if (!state.currentLesson) return;
+  const lesson = findLesson(state.currentLesson);
+  if (!lesson || !lesson.video || lesson.video.length === 0) return;
+  startSilentAISummary(state.currentLesson, lesson.video[0], lesson.name, getStageName(lesson.id));
+});
+
+// AI Summary — async task management
+let _pollTimer = null;
+let _silentTasks = {};  // lessonId -> {taskId, timer}
+let _panelTaskId = null;
+let _panelLessonId = null;
+let _panelLessonTitle = null;
+let _aiQuestions = [];
+
+function getStageName(lessonId) {
+  return findStageName(lessonId) || '';
+}
+
+// Starred filter
+document.getElementById('btn-starred').addEventListener('click', () => {
+  const starredIds = [...state.starred];
+  if (starredIds.length === 0) {
+    showNotifyToast('暂无收藏课程，点击课程名称旁的星标即可收藏', 'info');
+    return;
+  }
+  // Open dashboard to show the starred list section
+  dashboardPanel.classList.add('visible');
+  renderDashboard();
+  // Scroll to starred section
+  const starredSection = document.getElementById('starred-list');
+  if (starredSection) starredSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// Search (debounced)
+const searchInput = document.getElementById('search-input');
+let _searchDebounce = null;
+searchInput.addEventListener('input', () => {
+  if (_searchDebounce) clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(() => renderTree(searchInput.value), 200);
+});
+
+// Goal setting — mode tabs
+document.querySelectorAll('.goal-mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.goal-mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.dataset.mode;
+    document.getElementById('goal-lessons-row').classList.toggle('hidden', mode !== 'lessons');
+    document.getElementById('goal-duration-row').classList.toggle('hidden', mode !== 'duration');
+  });
+});
+
+document.getElementById('btn-set-goal').addEventListener('click', () => saveGoal());
+
+function saveGoal() {
+  const mode = document.querySelector('.goal-mode-btn.active').dataset.mode;
+  if (mode === 'lessons') {
+    const v = parseInt(document.getElementById('goal-input').value);
+    if (v > 0 && v < 100) {
+      state.goal = v;
+      state.goalMode = 'lessons';
+      saveState();
+      updateStats();
+      renderDashboard();
+    }
+  } else {
+    const v = parseInt(document.getElementById('goal-duration-input').value);
+    if (v >= 10 && v <= 600) {
+      state.goalMinutes = v;
+      state.goalMode = 'duration';
+      saveState();
+      updateStats();
+      renderDashboard();
+    }
+  }
+}
+
+// Notes toggle
+const notesCol = document.getElementById('notes-col');
+function toggleNotes() {
+  state.notesVisible = !state.notesVisible;
+  notesCol.style.display = state.notesVisible ? 'flex' : 'none';
+  saveState();
+}
+document.getElementById('btn-toggle-notes').addEventListener('click', toggleNotes);
+document.getElementById('btn-toggle-notes-top').addEventListener('click', toggleNotes);
+
+// Playlist prev/next
+document.getElementById('btn-pl-prev').addEventListener('click', () => playPrevInPlaylist());
+document.getElementById('btn-pl-next').addEventListener('click', () => playNextInPlaylist());
+
+// Sidebar collapse
+const sidebar = document.getElementById('sidebar');
+const btnCollapse = document.getElementById('btn-collapse-sidebar');
+btnCollapse.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+  state.sidebarCollapsed = sidebar.classList.contains('collapsed');
+  saveState();
+});
+
+// ============================================================
+// NOTES RESIZE
+// ============================================================
+(function() {
+  const handle = document.getElementById('notes-resize-handle');
+  let resizing = false, startX, startWidth;
+  handle.addEventListener('mousedown', (e) => {
+    resizing = true;
+    startX = e.clientX;
+    startWidth = notesCol.offsetWidth;
+    handle.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!resizing) return;
+    const w = Math.max(200, Math.min(600, startWidth - (e.clientX - startX)));
+    notesCol.style.width = w + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (resizing) {
+      resizing = false;
+      handle.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+})();
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  switch(e.key) {
+    case 'f': searchInput.focus(); e.preventDefault(); break;
+    case 'd': dashboardPanel.classList.toggle('visible'); if (dashboardPanel.classList.contains('visible')) renderDashboard(); e.preventDefault(); break;
+    case 'ArrowRight':
+      if (state.currentLesson) {
+        videoPlayer.currentTime += 10;
+        e.preventDefault();
+      }
+      break;
+    case 'ArrowLeft':
+      if (state.currentLesson) {
+        videoPlayer.currentTime -= 10;
+        e.preventDefault();
+      }
+      break;
+    case ' ':
+      if (state.currentLesson) {
+        videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
+        e.preventDefault();
+      }
+      break;
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+// RESET FUNCTIONS
+// ============================================================
+
+function confirmReset(msg, cb) {
+  if (confirm(msg)) { cb(); renderTree(); renderDashboard(); updateStats(); saveState(); }
+}
+
+function getStageLessonIds(stageId) {
+  const stage = COURSE_TREE.find(s => s.id === stageId);
+  return stage ? stage.lessons.map(l => l.id) : [];
+}
+
+// Dashboard buttons
+document.getElementById('btn-reset-completed').addEventListener('click', () => {
+  confirmReset('确定要清空所有已完成标记吗？此操作不可撤销。', () => {
+    state.completed.clear();
+    for (const id in state.annotations) {
+      delete state.annotations[id].completedDate;
+      if (Object.keys(state.annotations[id]).length === 0) delete state.annotations[id];
+    }
+  });
+});
+
+document.getElementById('btn-reset-watchtime').addEventListener('click', () => {
+  confirmReset('确定要清空所有观看时长统计吗？此操作不可撤销。', () => {
+    state.watchTime = {};
+  });
+});
+
+document.getElementById('btn-reset-positions').addEventListener('click', () => {
+  confirmReset('确定要清空所有播放位置记录吗？此操作不可撤销。', () => {
+    state.playPositions = {};
+  });
+});
+
+document.getElementById('btn-reset-all').addEventListener('click', () => {
+  confirmReset('确定要重置全部进度数据吗？包括完成标记、观看时长、播放位置。此操作不可撤销。', () => {
+    state.completed.clear();
+    state.playPositions = {};
+    state.watchTime = {};
+    for (const id in state.annotations) {
+      delete state.annotations[id].completedDate;
+      if (Object.keys(state.annotations[id]).length === 0) delete state.annotations[id];
+    }
+  });
+});
+
+// Stage-level reset — delegate from tree container
+treeContainer.addEventListener('click', (e) => {
+  if (e.target.classList.contains('stage-reset-btn')) {
+    e.stopPropagation();
+    const stageId = e.target.dataset.stageId;
+    const stage = COURSE_TREE.find(s => s.id === stageId);
+    if (!stage) return;
+    confirmReset(`确定要重置「${stage.name}」阶段的所有已完成标记吗？`, () => {
+      getStageLessonIds(stageId).forEach(id => {
+        state.completed.delete(id);
+        delete state.playPositions[id];
+        if (state.annotations[id]) {
+          delete state.annotations[id].completedDate;
+          if (Object.keys(state.annotations[id]).length === 0) delete state.annotations[id];
+        }
+      });
+    });
+  }
+});
+
+// Individual lesson reset — right-click on lesson node
+treeContainer.addEventListener('contextmenu', (e) => {
+  const node = e.target.closest('.lesson-node');
+  if (!node) return;
+  e.preventDefault();
+
+  const lessonId = node.dataset.lessonId;
+  const lessonName = node.querySelector('.lesson-name')?.textContent || '该课时';
+  const isCompleted = state.completed.has(lessonId);
+  const isStarred = state.starred.has(lessonId);
+
+  // Remove any existing context menu
+  const existing = document.querySelector('.ctx-menu');
+  if (existing) existing.remove();
+
+  const menu = document.createElement('div');
+  menu.className = 'ctx-menu';
+
+  let html = '';
+  if (isCompleted) {
+    html += `<div class="ctx-item" data-action="unmark">取消完成</div>`;
+  } else {
+    html += `<div class="ctx-item" data-action="mark">标记完成</div>`;
+  }
+  if (isStarred) {
+    html += `<div class="ctx-item" data-action="unstar">取消收藏</div>`;
+  } else {
+    html += `<div class="ctx-item" data-action="star">添加收藏</div>`;
+  }
+  html += `<div class="ctx-item ctx-danger" data-action="reset">重置进度</div>`;
+
+  menu.innerHTML = html;
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+  document.body.appendChild(menu);
+
+  const close = () => menu.remove();
+  setTimeout(() => {
+    document.addEventListener('click', close, { once: true });
+    document.addEventListener('contextmenu', close, { once: true });
+  }, 0);
+
+  menu.querySelectorAll('.ctx-item').forEach(item => {
+    item.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      if (item.dataset.action === 'unmark') {
+        state.completed.delete(lessonId);
+        if (state.annotations[lessonId]) {
+          delete state.annotations[lessonId].completedDate;
+          if (Object.keys(state.annotations[lessonId]).length === 0) delete state.annotations[lessonId];
+        }
+      } else if (item.dataset.action === 'mark') {
+        state.completed.add(lessonId);
+        const today = todayKey();
+        if (!state.annotations[lessonId]) state.annotations[lessonId] = {};
+        state.annotations[lessonId].completedDate = today;
+      } else if (item.dataset.action === 'reset') {
+        state.completed.delete(lessonId);
+        delete state.playPositions[lessonId];
+        if (state.annotations[lessonId]) {
+          delete state.annotations[lessonId].completedDate;
+          if (Object.keys(state.annotations[lessonId]).length === 0) delete state.annotations[lessonId];
+        }
+      } else if (item.dataset.action === 'star') {
+        state.starred.add(lessonId);
+      } else if (item.dataset.action === 'unstar') {
+        state.starred.delete(lessonId);
+      }
+      saveState();
+      renderTree();
+      renderDashboard();
+      updateStats();
+      menu.remove();
+    });
+  });
+});
+
+// ============================================================
+// AI SUMMARY — Start processing
+// ============================================================
+async function startAISummary(videoUrl, lessonTitle, stageTitle) {
+  const panel = document.getElementById('ai-summary-panel');
+  const progress = document.getElementById('ai-summary-progress');
+  const progressFill = document.getElementById('ai-progress-fill');
+  const progressText = document.getElementById('ai-progress-text');
+  const contentDiv = document.getElementById('ai-summary-content');
+  const quizList = document.getElementById('ai-quiz-list');
+  const lessonId = state.currentLesson;
+
+  panel.classList.add('visible');
+  progress.style.display = 'none';
+  quizList.innerHTML = '';
+
+  // Check cache
+  const cached = state.summaries[lessonId];
+  if (cached && cached.summary) {
+    renderAISummary(cached.summary, contentDiv);
+    document.getElementById('ai-summary-progress').style.display = 'none';
+    document.querySelector('.ai-summary-subtitle').innerHTML =
+      `<span>来自缓存 · ${new Date(cached.timestamp).toLocaleString()}</span>
+       <button id="btn-reanalyze" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;margin-left:12px;">重新分析</button>`;
+    document.getElementById('btn-reanalyze').addEventListener('click', () => {
+      delete state.summaries[lessonId];
+      saveState();
+      startAISummary(videoUrl, lessonTitle, stageTitle);
+    });
+    setupQuizSection(lessonId);
+    return;
+  }
+
+  // If a silent task is already running for this lesson, switch to panel mode
+  if (_silentTasks[lessonId]) {
+    const stolenTaskId = _silentTasks[lessonId].taskId;
+    _panelTaskId = stolenTaskId;
+    _panelLessonId = lessonId;
+    _panelLessonTitle = lessonTitle;
+    stopPolling();
+    _pollTimer = setInterval(() => {
+      pollAITask(stolenTaskId, progressFill, progressText, contentDiv, quizList, lessonId);
+    }, 3000);
+    stopSilentPoll(lessonId);
+    progress.style.display = 'block';
+    progressText.textContent = '正在分析中...';
+    return;
+  }
+
+  progress.style.display = 'block';
+  contentDiv.innerHTML = '';
+
+  try {
+    const resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ video: videoUrl, lesson_title: lessonTitle, stage_title: stageTitle }),
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error);
+
+    const taskId = data.task_id;
+    _panelTaskId = taskId;
+    _panelLessonId = lessonId;
+    _panelLessonTitle = lessonTitle;
+    stopPolling();
+    _pollTimer = setInterval(() => pollAITask(taskId, progressFill, progressText, contentDiv, quizList, lessonId), 2000);
+  } catch (err) {
+    contentDiv.innerHTML = `<div class="ai-summary-empty" style="color:var(--warn);">启动失败: ${err.message}</div>`;
+    progress.style.display = 'none';
+  }
+}
+
+async function pollAITask(taskId, progressFill, progressText, contentDiv, quizList, lessonId) {
+  try {
+    const resp = await fetch(`/api/ai-summary?task_id=${taskId}`);
+    const task = await resp.json();
+
+    progressFill.style.width = task.progress + '%';
+    progressText.textContent = task.message;
+
+    if (task.status === 'done') {
+      stopPolling();
+      _panelTaskId = _panelLessonId = _panelLessonTitle = null;
+      // Save to cache
+      if (lessonId) {
+        state.summaries[lessonId] = {
+          summary: task.summary,
+          questions: task.questions || [],
+          transcript: task.transcript || '',
+          timestamp: new Date().toISOString(),
+        };
+        saveState();
+      }
+      renderAISummary(task.summary, contentDiv);
+      setupQuizSection(lessonId);
+    } else if (task.status === 'error') {
+      stopPolling();
+      _panelTaskId = _panelLessonId = _panelLessonTitle = null;
+      contentDiv.innerHTML = `<div class="ai-summary-empty" style="color:var(--warn);">处理失败: ${task.message}</div>`;
+      document.getElementById('ai-summary-progress').style.display = 'none';
+    }
+  } catch (err) {
+    stopPolling();
+    _panelTaskId = _panelLessonId = _panelLessonTitle = null;
+    contentDiv.innerHTML = `<div class="ai-summary-empty" style="color:var(--warn);">查询失败: ${err.message}</div>`;
+    document.getElementById('ai-summary-progress').style.display = 'none';
+  }
+}
+
+function stopPolling() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+
+function convertPanelToSilent() {
+  if (!_pollTimer) return;  // No active panel poll
+  const taskId = _panelTaskId;
+  const lessonId = _panelLessonId;
+  const lessonTitle = _panelLessonTitle;
+  if (!taskId || !lessonId) {
+    stopPolling();
+    return;
+  }
+  // Move panel poll to silent mode
+  clearInterval(_pollTimer);
+  _pollTimer = null;
+  _silentTasks[lessonId] = { taskId, timer: null, lessonTitle };
+  _silentTasks[lessonId].timer = setInterval(() => silentPoll(taskId, lessonId, lessonTitle), 3000);
+  // Show progress bar but preserve current percentage — next poll will update
+  const bar = document.getElementById('ai-silent-progress');
+  if (bar) bar.style.display = 'flex';
+  document.getElementById('ai-silent-label').textContent = lessonTitle.length > 8 ? lessonTitle.slice(0,8) + '…' : lessonTitle;
+  _panelTaskId = _panelLessonId = _panelLessonTitle = null;
+}
+
+function stopSilentPoll(lessonId) {
+  const st = _silentTasks[lessonId];
+  if (st) {
+    if (st.timer) { clearInterval(st.timer); st.timer = null; }
+    delete _silentTasks[lessonId];
+    // Hide progress if no other silent tasks remain
+    if (Object.keys(_silentTasks).length === 0) {
+      hideSilentProgress();
+    }
+  }
+}
+
+async function startSilentAISummary(lessonId, videoUrl, lessonTitle, stageTitle) {
+  // If already running silently for this lesson, do nothing
+  if (_silentTasks[lessonId]) return;
+
+  // Check cache
+  const cached = state.summaries[lessonId];
+  if (cached && cached.summary) {
+    showNotifyToast(`「${lessonTitle}」已有缓存总结`, 'success');
+    return;
+  }
+
+  try {
+    const resp = await fetch('/api/ai-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ video: videoUrl, lesson_title: lessonTitle, stage_title: stageTitle })
+    });
+    const data = await resp.json();
+    if (!data.task_id) {
+      showNotifyToast('启动分析失败，请重试', 'error');
+      return;
+    }
+
+    showNotifyToast(`「${lessonTitle}」后台分析已启动`, 'info');
+    showSilentProgress(lessonTitle, 0);
+
+    _silentTasks[lessonId] = { taskId: data.task_id, timer: null, lessonTitle };
+    _silentTasks[lessonId].timer = setInterval(() => {
+      silentPoll(data.task_id, lessonId, lessonTitle);
+    }, 3000);
+  } catch (err) {
+    showNotifyToast('启动分析失败: ' + err.message, 'error');
+  }
+}
+
+function showSilentProgress(title, pct) {
+  const bar = document.getElementById('ai-silent-progress');
+  if (!bar) return;
+  bar.style.display = 'flex';
+  document.getElementById('ai-silent-label').textContent = title.length > 8 ? title.slice(0,8) + '…' : title;
+  document.getElementById('ai-silent-fill').style.width = pct + '%';
+  document.getElementById('ai-silent-pct').textContent = pct + '%';
+}
+
+function updateSilentProgress(pct, msg) {
+  const bar = document.getElementById('ai-silent-progress');
+  if (!bar || bar.style.display === 'none') return;
+  document.getElementById('ai-silent-fill').style.width = pct + '%';
+  document.getElementById('ai-silent-pct').textContent = pct + '%';
+  if (msg) document.getElementById('ai-silent-label').textContent = msg;
+}
+
+function hideSilentProgress() {
+  const bar = document.getElementById('ai-silent-progress');
+  if (bar) bar.style.display = 'none';
+}
+
+async function silentPoll(taskId, lessonId, lessonTitle) {
+  try {
+    const resp = await fetch(`/api/ai-summary?task_id=${taskId}`);
+    const task = await resp.json();
+
+    // Update progress bar
+    updateSilentProgress(task.progress || 0, task.message);
+
+    if (task.status === 'done') {
+      stopSilentPoll(lessonId);
+      hideSilentProgress();
+      state.summaries[lessonId] = {
+        summary: task.summary,
+        questions: task.questions || [],
+        transcript: task.transcript || '',
+        timestamp: new Date().toISOString(),
+      };
+      saveState();
+      showNotifyToast(`「${lessonTitle}」AI 总结完成 — 点击查看`, 'success', () => {
+        const lesson = findLesson(lessonId);
+        if (lesson) selectLesson(lesson);
+        aiSummaryPanel.classList.add('visible');
+        startAISummary(null, lessonTitle, '');
+      });
+    } else if (task.status === 'error') {
+      stopSilentPoll(lessonId);
+      hideSilentProgress();
+      showNotifyToast(`「${lessonTitle}」分析失败: ${task.message}`, 'error');
+    }
+  } catch (err) {
+    stopSilentPoll(lessonId);
+    hideSilentProgress();
+    showNotifyToast('查询进度失败: ' + err.message, 'error');
+  }
+}
+
+// ============================================================
+// TOAST NOTIFICATION
+// ============================================================
+let _toastTimer = null;
+function showNotifyToast(msg, type, onClick) {
+  let toast = document.getElementById('ai-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'ai-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;' +
+      'padding:12px 20px;border-radius:10px;font-size:14px;color:#fff;cursor:pointer;' +
+      'transition:opacity 0.3s;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+    document.body.appendChild(toast);
+  }
+  const colors = { success: '#4ade80', error: '#f87171', info: '#60a5fa' };
+  toast.style.background = colors[type] || colors.info;
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.onclick = onClick || null;
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { toast.style.opacity = '0'; }, 6000);
+}
+
+// ============================================================
+// QUIZ SECTION — Count picker + generate/refresh
+// ============================================================
+function setupQuizSection(lessonId) {
+  const quizList = document.getElementById('ai-quiz-list');
+  const cached = state.summaries[lessonId];
+  if (!cached) {
+    quizList.innerHTML = '<div class="ai-summary-empty">暂无总结数据</div>';
+    return;
+  }
+
+  // Remove old control buttons
+  quizList.parentNode.querySelectorAll('.btn-ai-quiz-action').forEach(b => b.remove());
+
+  if (cached.questions && cached.questions.length > 0) {
+    _aiQuestions = cached.questions;
+    renderAIQuiz(cached.questions, quizList);
+    // Add refresh button
+    const refreshBtn = document.createElement('button');
+    refreshBtn.className = 'btn-ai-quiz-action';
+    refreshBtn.textContent = '刷新题目';
+    refreshBtn.addEventListener('click', () => showQuizCountPicker(lessonId, true));
+    quizList.parentNode.insertBefore(refreshBtn, quizList);
+  } else {
+    const genBtn = document.createElement('button');
+    genBtn.className = 'btn-ai-quiz-action';
+    genBtn.textContent = '生成题目';
+    genBtn.addEventListener('click', () => showQuizCountPicker(lessonId, false));
+    quizList.innerHTML = '';
+    quizList.parentNode.insertBefore(genBtn, quizList);
+  }
+}
+
+function showQuizCountPicker(lessonId, isRefresh) {
+  // Remove existing picker
+  const existing = document.querySelector('.quiz-count-picker');
+  if (existing) existing.remove();
+
+  const picker = document.createElement('div');
+  picker.className = 'quiz-count-picker';
+  picker.innerHTML = `
+    <div class="quiz-count-title">${isRefresh ? '刷新题目 — 选择题目数量' : '选择题目数量'}</div>
+    <div class="quiz-count-options">
+      <button class="quiz-count-opt" data-count="3">3 题</button>
+      <button class="quiz-count-opt selected" data-count="5">5 题</button>
+      <button class="quiz-count-opt" data-count="10">10 题</button>
+    </div>
+    <div class="quiz-count-actions">
+      <button class="quiz-count-cancel">取消</button>
+    </div>
+  `;
+
+  const quizList = document.getElementById('ai-quiz-list');
+  quizList.parentNode.insertBefore(picker, quizList);
+
+  // Bind option clicks
+  picker.querySelectorAll('.quiz-count-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      picker.querySelectorAll('.quiz-count-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const count = parseInt(btn.dataset.count);
+      picker.remove();
+      generateQuiz(lessonId, count);
+    });
+  });
+
+  // Bind cancel
+  picker.querySelector('.quiz-count-cancel').addEventListener('click', () => picker.remove());
+
+  // Click outside to close
+  setTimeout(() => {
+    const closeHandler = (e) => {
+      if (!picker.contains(e.target)) { picker.remove(); document.removeEventListener('click', closeHandler); }
+    };
+    document.addEventListener('click', closeHandler);
+  }, 0);
+}
+
+async function generateQuiz(lessonId, count) {
+  const quizList = document.getElementById('ai-quiz-list');
+  const cached = state.summaries[lessonId];
+  if (!cached || !cached.transcript) {
+    quizList.innerHTML = '<div class="ai-summary-empty">缺少语音转录数据，请重新进行AI总结</div>';
+    return;
+  }
+
+  quizList.innerHTML = '<div class="ai-summary-empty">正在生成题目...</div>';
+
+  // Remove old control buttons and pickers
+  quizList.parentNode.querySelectorAll('.btn-ai-quiz-action, .quiz-count-picker').forEach(b => b.remove());
+
+  try {
+    const resp = await fetch('/api/ai-quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transcript: cached.transcript,
+        lesson_title: cached.summary ? '' : (cached.lesson_title || ''),
+        stage_title: cached.summary ? '' : (cached.stage_title || ''),
+        count: count,
+      }),
+    });
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.error);
+
+    _aiQuestions = data.questions;
+    cached.questions = data.questions;
+    state.summaries[lessonId] = cached;
+    saveState();
+
+    renderAIQuiz(data.questions, quizList);
+
+    // Add refresh button
+    const refreshBtn = document.createElement('button');
+    refreshBtn.className = 'btn-ai-quiz-action';
+    refreshBtn.textContent = '刷新题目';
+    refreshBtn.addEventListener('click', () => showQuizCountPicker(lessonId, true));
+    quizList.parentNode.insertBefore(refreshBtn, quizList);
+  } catch (err) {
+    quizList.innerHTML = `<div class="ai-summary-empty" style="color:var(--warn);">题目生成失败: ${err.message}</div>`;
+  }
+}
+
+// ============================================================
+// AI SUMMARY — Render Summary
+// ============================================================
+function renderAISummary(summary, container) {
+  if (!summary || !summary.core_points) {
+    container.innerHTML = '<div class="ai-summary-empty">未能生成总结</div>';
+    return;
+  }
+
+  let html = '';
+  if (summary.core_points && summary.core_points.length > 0) {
+    html += `<div class="ai-summary-block"><h4>核心知识点</h4><ul>${summary.core_points.map(p => `<li>${escapeHtml(p)}</li>`).join('')}</ul></div>`;
+  }
+  if (summary.key_difficulties && summary.key_difficulties.length > 0) {
+    html += `<div class="ai-summary-block"><h4>重点难点</h4><ul>${summary.key_difficulties.map(p => `<li>${escapeHtml(p)}</li>`).join('')}</ul></div>`;
+  }
+  if (summary.one_liner) {
+    html += `<div class="ai-summary-oneliner">${escapeHtml(summary.one_liner)}</div>`;
+  }
+  container.innerHTML = html;
+  document.getElementById('ai-summary-progress').style.display = 'none';
+}
+
+// ============================================================
+// AI SUMMARY — Render Quiz Questions
+// ============================================================
+function renderAIQuiz(questions, container) {
+  _aiQuestions = questions || [];
+  if (_aiQuestions.length === 0) {
+    container.innerHTML = '<div class="ai-summary-empty">未生成题目</div>';
+    return;
+  }
+
+  container.innerHTML = _aiQuestions.map((q, i) => {
+    let html = `<div class="ai-question">`;
+    html += `<div class="ai-q-type">${q.type === 'choice' ? '选择题' : '简答题'}${q.source_time ? ` · <span class="ai-source-link" data-time="${q.source_time}" title="跳转到视频对应片段">${q.source_time}</span>` : ''}</div>`;
+    html += `<div class="ai-q-text">${i + 1}. ${escapeHtml(q.question)}</div>`;
+
+    if (q.type === 'choice') {
+      html += `<div class="ai-q-options">`;
+      q.options.forEach((opt, oi) => {
+        let cls = 'ai-option';
+        if (q._answered) {
+          if (oi === q.answer) cls += ' correct';
+          else if (oi === q._userAnswer) cls += ' wrong';
+        } else if (q._userAnswer === oi) {
+          cls += ' selected';
+        }
+        html += `<div class="${cls}" data-qi="${i}" data-oi="${oi}">${escapeHtml(opt)}</div>`;
+      });
+      html += `</div>`;
+      if (!q._answered) {
+        html += `<button class="btn-ai-submit" data-qi="${i}" ${q._userAnswer === undefined ? 'disabled' : ''}>提交</button>`;
+      }
+      if (q._answered) {
+        html += `<div class="ai-feedback ${q._correct ? 'correct' : 'wrong'}">${q._correct ? '✓ 回答正确' : '✗ 回答错误'}</div>`;
+        if (!q._correct) {
+          html += `<div class="ai-answer-reveal">正确答案: ${escapeHtml(q.options[q.answer])}</div>`;
+        }
+      }
+    } else {
+      if (q._answered) {
+        html += `<div class="ai-answer-reveal">参考答案: ${escapeHtml(q.answer)}</div>`;
+      } else {
+        html += `<textarea id="ai-textarea-${i}" placeholder="输入你的回答..." style="width:100%;height:60px;background:rgba(255,255,255,0.03);border:1px solid var(--border-light);color:var(--text);border-radius:6px;padding:8px;font-size:12px;resize:vertical;margin-bottom:8px;"></textarea>`;
+        html += `<button class="btn-ai-submit" data-qi="${i}">提交简答</button>`;
+      }
+    }
+    html += `</div>`;
+    return html;
+  }).join('');
+
+  // Bind option clicks
+  container.querySelectorAll('.ai-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const qi = parseInt(opt.dataset.qi);
+      const oi = parseInt(opt.dataset.oi);
+      if (_aiQuestions[qi]._answered) return;
+      container.querySelectorAll(`.ai-option[data-qi="${qi}"]`).forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      _aiQuestions[qi]._userAnswer = oi;
+      const btn = container.querySelector(`.btn-ai-submit[data-qi="${qi}"]`);
+      if (btn) btn.disabled = false;
+    });
+  });
+
+  // Bind submit buttons
+  container.querySelectorAll('.btn-ai-submit').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qi = parseInt(btn.dataset.qi);
+      const q = _aiQuestions[qi];
+      if (q._answered) return;
+      if (q.type === 'choice') {
+        if (q._userAnswer === undefined) return;
+        q._answered = true;
+        q._correct = q._userAnswer === q.answer;
+      } else {
+        const textarea = document.getElementById(`ai-textarea-${qi}`);
+        const answer = textarea?.value?.trim() || '';
+        if (!answer) return;
+        q._answered = true;
+        q._userAnswer = answer;
+        const keywords = q.answer.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+        const matchCount = keywords.filter(w => answer.toLowerCase().includes(w)).length;
+        q._correct = keywords.length > 0 && matchCount / keywords.length >= 0.4;
+      }
+      renderAIQuiz(_aiQuestions, container);
+    });
+  });
+
+  // Bind source time links — jump to video segment
+  container.querySelectorAll('.ai-source-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      seekVideoToTime(link.dataset.time);
+    });
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+// ============================================================
+// BOOTSTRAP VALIDATION — catches missing IDs/functions early
+// ============================================================
+function validateBootstrap() {
+  const requiredIds = [
+    'tree-container', 'btn-theme', 'notes-col', 'btn-toggle-notes',
+    'goal-lessons-row', 'goal-duration-row', 'goal-input', 'goal-duration-input',
+    'search-input', 'btn-dashboard', 'btn-starred', 'btn-ai-summary',
+    'dash-cards', 'stage-progress-list', 'starred-list'
+  ];
+  const missingIds = requiredIds.filter(id => !document.getElementById(id));
+  const requiredFns = ['renderTree', 'renderDashboard', 'updateStats',
+    'selectLesson', 'saveState', 'toggleNotes', 'findLesson', 'findStageName',
+    'playPrevInPlaylist', 'playNextInPlaylist', 'startAISummary', 'saveGoal'];
+  const missingFns = requiredFns.filter(fn => typeof window[fn] !== 'function');
+
+  const errors = [];
+  if (missingIds.length) errors.push('Missing DOM IDs: ' + missingIds.join(', '));
+  if (missingFns.length) errors.push('Missing functions: ' + missingFns.join(', '));
+
+  if (errors.length) {
+    const el = document.getElementById('tree-container');
+    if (el) {
+      el.innerHTML = '<div style="padding:20px;color:#ef4444;font-size:14px;line-height:1.8"><b>启动失败</b><br>' +
+        errors.join('<br>') + '</div>';
+    }
+    throw new Error('Bootstrap validation failed:\n' + errors.join('\n'));
+  }
+}
+
+async function init() {
+  try {
+    loadState();
+    validateBootstrap();
+
+    // Load course data
+    const resp = await fetch('course-data.json');
+    if (!resp.ok) throw new Error('course-data.json HTTP ' + resp.status);
+    COURSE_TREE = await resp.json();
+
+    // Apply theme
+    if (state.theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+    document.getElementById('btn-theme').textContent = state.theme === 'light' ? '☀' : '☾';
+
+    // Restore notes
+    if (state.notesVisible) {
+      document.getElementById('notes-col').style.display = 'flex';
+      document.getElementById('btn-toggle-notes').classList.add('active');
+    }
+
+    // Restore goal
+    document.querySelectorAll('.goal-mode-btn').forEach(b => b.classList.remove('active'));
+    if (state.goalMode === 'duration') {
+      document.querySelector('.goal-mode-btn[data-mode="duration"]').classList.add('active');
+      document.getElementById('goal-lessons-row').classList.add('hidden');
+      document.getElementById('goal-duration-row').classList.remove('hidden');
+    } else {
+      document.querySelector('.goal-mode-btn[data-mode="lessons"]').classList.add('active');
+      document.getElementById('goal-duration-row').classList.add('hidden');
+      document.getElementById('goal-lessons-row').classList.remove('hidden');
+    }
+    document.getElementById('goal-input').value = state.goal;
+    document.getElementById('goal-duration-input').value = state.goalMinutes;
+
+    renderTree();
+    renderDashboard();
+    renderContinueWatching();
+    updateStats();
+
+    // Close button for continue-watching bar
+    document.getElementById('cw-close').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('continue-watching').classList.remove('visible');
+    });
+  } catch (e) {
+    console.error('Init failed:', e.message);
+  }
+}
+
+function seekVideoToTime(timeStr) {
+  // Parse "MM:SS" or "HH:MM:SS" to seconds
+  if (!timeStr || !videoPlayer) return;
+  const parts = timeStr.split(':').map(Number);
+  let seconds = 0;
+  if (parts.length === 3) {
+    seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+  } else if (parts.length === 2) {
+    seconds = parts[0] * 60 + parts[1];
+  } else {
+    seconds = parts[0];
+  }
+  // Ensure video panel is visible (skip — no video-panel element in DOM)
+  videoPlayer.currentTime = seconds;
+  videoPlayer.play().catch(() => {});
+  // Flash highlight feedback on the source link
+  const srcLinks = document.querySelectorAll('.ai-source-link');
+  srcLinks.forEach(l => l.classList.remove('flash'));
+  setTimeout(() => { srcLinks.forEach(l => l.classList.remove('flash')); }, 100);
+}
+
+init();
+</script>
+</body>
+</html>
