@@ -13,8 +13,23 @@
 ##  截图预览
 
 <div align="center">
-  <img src="screenshots/dashboard.png" alt="Dashboard View" width="800"/>
-  <p><em>主界面 - 课程树 + 视频播放器 + 数据仪表盘</em></p>
+  
+  ### 主界面（亮色主题）
+  <img src="screenshots/dashboard-light.png" alt="Dashboard Light Theme" width="800"/>
+  <p><em>课程树导航 + 视频播放器 + 学习进度追踪</em></p>
+  
+  ### 主界面（暗色主题）
+  <img src="screenshots/dashboard-dark.png" alt="Dashboard Dark Theme" width="800"/>
+  <p><em>一键切换暗色主题，保护视力</em></p>
+  
+  ### AI 智能总结
+  <img src="screenshots/ai-summary.png" alt="AI Summary Panel" width="800"/>
+  <p><em>DeepSeek API 自动生成视频内容总结和练习题</em></p>
+  
+  ### 数据仪表盘
+  <img src="screenshots/progress-dashboard.png" alt="Progress Dashboard" width="800"/>
+  <p><em>今日目标、阶段进度、收藏管理一目了然</em></p>
+  
 </div>
 
 ---
